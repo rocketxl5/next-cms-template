@@ -64,3 +64,16 @@ export function verifyRefreshToken(token: string): JwtPayload {
 
   return decoded as JwtPayload;
 }
+
+export function verifyAccessToken(token: string): JwtPayload {
+  const secret = process.env.JWT_ACCESS_SECRET!;
+
+  const decoded = jwt.verify(token, secret);
+
+  if (typeof decoded === 'string') {
+    throw new Error('Invalid token payload');
+  }
+
+  return decoded as JwtPayload;
+}
+
