@@ -13,22 +13,56 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ContentType {
+  PRODUCT
+  POST
+  PAGE
+  COLLECTION
+  MEDIA
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
 model User {
-  id               String   @id @default(cuid())
-  name             String?
-  email            String   @unique
-  password         String
-  role             String   @default("user")
+  id       String  @id @default(cuid())
+  name     String?
+  email    String  @unique
+  password String
+  role     String  @default("user")
 
   // Refresh token rotation / security
   refreshTokenHash String?
 
   // Account status flags
-  isActive         Boolean  @default(true)
-  isVerified       Boolean  @default(false)
+  isActive   Boolean @default(true)
+  isVerified Boolean @default(false)
+
+  // Back-relation: optional in SQL, required in Prisma for type
+  contents ContentItem[]
 
   // Metadata
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
+model ContentItem {
+  id          String        @id @default(cuid())
+  title       String
+  slug        String        @unique
+  description String?
+  body        String?
+  price       Float?
+  status      ContentStatus @default(DRAFT)
+  type        ContentType
+
+  // Foreign key stores is of User who creates content
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
