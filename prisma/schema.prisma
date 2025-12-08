@@ -27,26 +27,26 @@ enum ContentStatus {
   ARCHIVED
 }
 
+enum Role {
+  USER
+  AUTHOR
+  EDITOR
+  ADMIN
+  SUPER_ADMIN
+}
+
 model User {
-  id       String  @id @default(cuid())
-  name     String?
-  email    String  @unique
-  password String
-  role     String  @default("user")
-
-  // Refresh token rotation / security
+  id               String        @id @default(cuid())
+  name             String?
+  email            String        @unique
+  password         String
+  role             Role          @default(USER)
   refreshTokenHash String?
-
-  // Account status flags
-  isActive   Boolean @default(true)
-  isVerified Boolean @default(false)
-
-  // Back-relation: optional in SQL, required in Prisma for type
-  contents ContentItem[]
-
-  // Metadata
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  isActive         Boolean       @default(true)
+  isVerified       Boolean       @default(false)
+  contents         ContentItem[]
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 }
 
 model ContentItem {
@@ -58,11 +58,8 @@ model ContentItem {
   price       Float?
   status      ContentStatus @default(DRAFT)
   type        ContentType
-
-  // Foreign key stores is of User who creates content
-  authorId String
-  author   User   @relation(fields: [authorId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  authorId    String
+  author      User          @relation(fields: [authorId], references: [id])
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
