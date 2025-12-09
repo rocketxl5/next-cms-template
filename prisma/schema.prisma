@@ -42,22 +42,23 @@ enum Role {
 // -------------------------------------------------------
 
 model User {
-  id       String  @id @default(cuid())
-  name     String?
-  email    String  @unique
-  password String
-  role     Role    @default(USER)
+  id                String    @id @default(cuid())
+  name              String?
+  email             String    @unique
+  password          String
+  role              Role      @default(USER)
 
   // Refresh token rotation
-  refreshTokenHash String?
+  refreshTokenHash  String?
 
-  contents ContentItem[]
+  contents          ContentItem[]
 
-  isActive   Boolean @default(true)
-  isVerified Boolean @default(false)
+  isActive          Boolean   @default(true)
+  isVerified        Boolean   @default(false)
+  isSeed            Boolean   @default(false) 
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 }
 
 // -------------------------------------------------------
@@ -66,28 +67,29 @@ model User {
 // -------------------------------------------------------
 
 model ContentItem {
-  id          String      @id @default(cuid())
-  type        ContentType
-  title       String?
-  slug        String?     @unique
-  description String?
-  body        Json? // Rich content (editor output)
-  meta        Json? // SEO metada / custom fields
+  id            String        @id @default(cuid())
+  type          ContentType
+  title         String?
+  slug          String?       @unique
+  description   String?
+  body          Json? // Rich content (editor output)
+  meta          Json? // SEO metada / custom fields
 
-  price  Float?
-  status ContentStatus @default(DRAFT)
+  price         Float?
+  status        ContentStatus @default(DRAFT)
 
   // Foreign key to user
-  authorId String?
-  author   User?   @relation(fields: [authorId], references: [id])
+  authorId      String?
+  author        User?         @relation(fields: [authorId], references: [id])
+  isSeed        Boolean       @default(false)
 
   // For product/category hierarchy
-  parentId String?
-  parent   ContentItem?  @relation("Children", fields: [parentId], references: [id])
-  children ContentItem[] @relation("Children")
+  parentId      String?
+  parent        ContentItem?  @relation("Children", fields: [parentId], references: [id])
+  children      ContentItem[] @relation("Children")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }
 
 // -------------------------------------------------------

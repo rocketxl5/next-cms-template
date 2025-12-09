@@ -1,135 +1,121 @@
 /**
  * SEED SCRIPT
  * -------------------------------------------------------
- * Creates:
- *   - Super Admin user
- *   - Demo Users (optional)
- *   - Sample CMS content (pages, categories, products)
+ * Purpose:
+ *   - Create super admin, editor, author, and regular user
+ *   - Seed sample CMS content: products, pages, blog posts
+ *   - Mark seed records with isSeed
  *
  * Run:
  *   npx prisma db seed
- *
- * Notes:
- *   Render supports seeds by default as long as
- *   "prisma": { "seed": "ts-node prisma/seed.ts" }
- *   is defined in package.json.
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Role, ContentType, ContentStatus } from '@prisma/client';
+import type { User } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // ----------------------------
-  // 1️⃣ Create users
-  // ----------------------------
-
   const hashedPassword = await bcrypt.hash('Password123!', 10);
 
-  const admin = await prisma.user.upsert({
-    where: { email: 'admin@example.com' },
-    update: {},
-    create: {
-      name: 'Admin User',
-      email: 'admin@example.com',
-      password: hashedPassword,
-      role: 'ADMIN',
-      isVerified: true,
-    },
-  });
+  // ----------------------------
+  // 1️⃣ Seed Users
+  // ----------------------------
+  const users = [
+    { name: 'Super Admin', email: 'admin@example.com', role: Role.ADMIN },
+    { name: 'Editor User', email: 'editor@example.com', role: Role.EDITOR },
+    { name: 'Author User', email: 'author@example.com', role: Role.AUTHOR },
+    { name: 'Regular User', email: 'user@example.com', role: Role.USER },
+  ];
 
-  const editor = await prisma.user.upsert({
-    where: { email: 'editor@example.com' },
-    update: {},
-    create: {
-      name: 'Editor User',
-      email: 'editor@example.com',
-      password: hashedPassword,
-      role: 'EDITOR',
-      isVerified: true,
-    },
-  });
+  const createdUsers: Record<string, User> = {};
 
-  const author = await prisma.user.upsert({
-    where: { email: 'author@example.com' },
-    update: {},
-    create: {
-      name: 'Author User',
-      email: 'author@example.com',
-      password: hashedPassword,
-      role: 'AUTHOR',
-      isVerified: true,
-    },
-  });
-
-  const user = await prisma.user.upsert({
-    where: { email: 'user@example.com' },
-    update: {},
-    create: {
-      name: 'Regular User',
-      email: 'user@example.com',
-      password: hashedPassword,
-      role: 'USER',
-      isVerified: true,
-    },
-  });
+  for (const u of users) {
+    const user = await prisma.user.upsert({
+      where: { email: u.email },
+      update: {},
+      create: {
+        name: u.name,
+        email: u.email,
+        password: hashedPassword,
+        role: u.role,
+        isVerified: true,
+        isSeed: true,
+      },
+    });
+    createdUsers[u.role] = user; // store for authorId references
+  }
 
   // ----------------------------
-  // 2️⃣ Create ContentItems
+  // 2️⃣ Seed ContentItems
   // ----------------------------
-  const product1 = await prisma.contentItem.create({
-    data: {
+  const contentItems = [
+    {
       title: 'Sample Product 1',
       slug: 'sample-product-1',
       description: 'This is a demo product.',
       price: 19.99,
-      type: 'PRODUCT',
-      status: 'PUBLISHED',
-      authorId: admin.id,
+      type: ContentType.PRODUCT,
+      status: ContentStatus.PUBLISHED,
+      authorId: createdUsers[Role.ADMIN].id,
     },
-  });
-
-  const product2 = await prisma.contentItem.create({
-    data: {
+    {
       title: 'Sample Product 2',
       slug: 'sample-product-2',
       description: 'Another demo product.',
       price: 29.99,
-      type: 'PRODUCT',
-      status: 'PUBLISHED',
-      authorId: admin.id,
+      type: ContentType.PRODUCT,
+      status: ContentStatus.PUBLISHED,
+      authorId: createdUsers[Role.ADMIN].id,
     },
-  });
-
-  const blogPost = await prisma.contentItem.create({
-    data: {
+    {
       title: 'Hello World Blog',
       slug: 'hello-world-blog',
-      body: 'This is a demo blog post.',
-      type: 'POST',
-      status: 'PUBLISHED',
-      authorId: author.id,
+      body: { text: 'This is a demo blog post.' },
+      type: ContentType.POST,
+      status: ContentStatus.PUBLISHED,
+      authorId: createdUsers[Role.AUTHOR].id,
     },
-  });
-
-  const page = await prisma.contentItem.create({
-    data: {
+    {
       title: 'About Us',
       slug: 'about-us',
-      body: 'This is a sample CMS page.',
-      type: 'PAGE',
-      status: 'PUBLISHED',
-      authorId: editor.id,
+      body: { text: 'This is a sample CMS page.' },
+      type: ContentType.PAGE,
+      status: ContentStatus.PUBLISHED,
+      authorId: createdUsers[Role.EDITOR].id,
     },
-  });
+  ];
+
+  for (const item of contentItems) {
+    await prisma.contentItem.upsert({
+      where: { slug: item.slug! },
+      update: {
+        title: item.title,
+        body: item.body,
+        description: item.description,
+        price: item.price,
+        status: item.status,
+        type: item.type,
+        authorId: item.authorId,
+      },
+      create: {
+        title: item.title,
+        slug: item.slug,
+        body: item.body,
+        description: item.description,
+        price: item.price,
+        status: item.status,
+        type: item.type,
+        authorId: item.authorId,
+        isSeed: true,
+      },
+    });
+  }
 
   console.log('✅ Database seeded successfully');
-  console.log({ admin, editor, author, user });
-  console.log({ product1, product2, blogPost, page });
 }
 
-// Run the seed
 main()
   .catch((e) => {
     console.error('❌ Seed failed:', e);
