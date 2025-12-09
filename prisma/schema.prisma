@@ -93,6 +93,20 @@ model ContentItem {
 }
 
 // -------------------------------------------------------
+// SETTINGS MODEL 
+// -------------------------------------------------------
+
+model Settings {
+  id           String   @id @default("global") // singleton
+  siteName     String   @default("CMS + E-commerce Template")
+  contactEmail String   @default("admin@example.com")
+  theme        String   @default("light")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+
+// -------------------------------------------------------
 // FUTURE: ORDER / CART (optional)
 // -------------------------------------------------------
 // model Order { ... }

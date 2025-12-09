@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
 
 async function clearDatabase() {
   // ⚡ Delete dependent tables first to avoid foreign key constraints
