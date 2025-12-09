@@ -10,10 +10,11 @@
  *   npx prisma db seed
  */
 
-import { Role, ContentType, ContentStatus } from '@prisma/client';
+import { PrismaClient, Role, ContentType, ContentStatus } from '@prisma/client';
 import type { User } from '@prisma/client';
-import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+
+const prisma = new PrismaClient();
 
 async function main() {
   const hashedPassword = await bcrypt.hash('Password123!', 10);
