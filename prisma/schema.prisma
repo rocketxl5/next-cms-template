@@ -1,8 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// -------------------------------------------------------
+// PRISMA SCHEMA — CMS-FIRST + AUTH + ECOMMERCE READY
+// -------------------------------------------------------
 
 generator client {
   provider = "prisma-client-js"
@@ -12,6 +10,10 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// -------------------------------------------------------
+// ENUMS
+// -------------------------------------------------------
 
 enum ContentType {
   PRODUCT
@@ -35,31 +37,61 @@ enum Role {
   SUPER_ADMIN
 }
 
+// -------------------------------------------------------
+// USER MODEL
+// -------------------------------------------------------
+
 model User {
-  id               String        @id @default(cuid())
-  name             String?
-  email            String        @unique
-  password         String
-  role             Role          @default(USER)
+  id       String  @id @default(cuid())
+  name     String?
+  email    String  @unique
+  password String
+  role     Role    @default(USER)
+
+  // Refresh token rotation
   refreshTokenHash String?
-  isActive         Boolean       @default(true)
-  isVerified       Boolean       @default(false)
-  contents         ContentItem[]
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+
+  contents ContentItem[]
+
+  isActive   Boolean @default(true)
+  isVerified Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
+// -------------------------------------------------------
+// CONTENT MODEL — CMS-FIRST
+// Highly flexible, used by admin dashboard
+// -------------------------------------------------------
+
 model ContentItem {
-  id          String        @id @default(cuid())
-  title       String
-  slug        String        @unique
-  description String?
-  body        String?
-  price       Float?
-  status      ContentStatus @default(DRAFT)
+  id          String      @id @default(cuid())
   type        ContentType
-  authorId    String
-  author      User          @relation(fields: [authorId], references: [id])
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  title       String?
+  slug        String?     @unique
+  description String?
+  body        Json? // Rich content (editor output)
+  meta        Json? // SEO metada / custom fields
+
+  price  Float?
+  status ContentStatus @default(DRAFT)
+
+  // Foreign key to user
+  authorId String?
+  author   User?   @relation(fields: [authorId], references: [id])
+
+  // For product/category hierarchy
+  parentId String?
+  parent   ContentItem?  @relation("Children", fields: [parentId], references: [id])
+  children ContentItem[] @relation("Children")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
+
+// -------------------------------------------------------
+// FUTURE: ORDER / CART (optional)
+// -------------------------------------------------------
+// model Order { ... }
+// model OrderItem { ... }
