@@ -12,7 +12,7 @@
 
 import { Role, ContentType, ContentStatus } from '@prisma/client';
 import type { User } from '@prisma/client';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 
 async function main() {
@@ -111,6 +111,21 @@ async function main() {
       },
     });
   }
+
+  await prisma.settings.upsert({
+    where: { id: 'global' },
+    update: {
+      siteName: 'CMS + E-commerce Template',
+      contactEmail: 'admin@example.com',
+      theme: 'light',
+    },
+    create: {
+      id: 'global',
+      siteName: 'CMS + E-commerce Template',
+      contactEmail: 'admin@example.com',
+      theme: 'light',
+    },
+  });
 
   console.log('✅ Database seeded successfully');
 }
