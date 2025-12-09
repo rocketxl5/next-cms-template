@@ -38,7 +38,7 @@
 
 import { NextResponse } from 'next/server';
 import { requireRole } from '@/lib/auth/role';
-import { prisma } from '@/lib/prisma';
+import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 
 // --------------------

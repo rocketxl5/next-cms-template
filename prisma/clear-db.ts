@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+import prisma from '@/lib/prisma';
 
 async function clearDatabase() {
   // ⚡ Delete dependent tables first to avoid foreign key constraints

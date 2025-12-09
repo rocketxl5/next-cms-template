@@ -27,7 +27,7 @@
 
 import { NextResponse } from 'next/server';
 import { requireRole } from '@/lib/auth/role';
-import { prisma } from '@/lib/prisma';
+import prisma from '@/lib/prisma';
 
 // -------------------------------------------------------
 // GET — List all posts
