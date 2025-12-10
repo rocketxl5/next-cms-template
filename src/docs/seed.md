@@ -48,8 +48,73 @@ You can save it as:
 
 * Run the seed manually:
 
-```sh
-npx prisma db seed
+# **there are two different commands** and they do different things.
+
+---
+
+# ✅ **1. Local development migration (creates a new migration)**
+
+You use this when you **change the schema locally** and want Prisma to *generate a new migration file*:
+
+### **Local migration (creates migration files)**
+
+```
+yarn prisma migrate dev --name some_name
+```
+
+Short form:
+
+```
+yarn prisma -D --name some_name
+```
+
+This:
+
+* Reads your `schema.prisma`
+* Generates SQL migration files in `prisma/migrations/*`
+* Applies them to your *local* database
+
+---
+
+# ✅ **2. Production migration (applies existing migration files)**
+
+Render (or any prod server) should **never generate migrations**.
+
+Instead, it applies the already-existing migration files.
+
+### **Production migration (apply only)**
+
+```
+yarn prisma migrate deploy
+```
+
+This:
+
+* Does **not** generate new migrations
+* Does **not** require a name
+* Only applies the migration files already in `/prisma/migrations`
+
+This is the correct command to run in deployment (Render, Vercel, Railway, etc.).
+
+---
+
+# 🧠 Summary
+
+| Environment                     | Purpose                      | Command                                      |
+| ------------------------------- | ---------------------------- | -------------------------------------------- |
+| **Local dev**                   | Create new migration + apply | `yarn prisma migrate dev --name change_name` |
+| **Production (Render)**         | Apply existing migrations    | `yarn prisma migrate deploy`                 |
+| **Seeding (both local + prod)** | Populate DB                  | `yarn prisma db seed`                        |
+
+---
+
+# ⭐ What you should run on **Render**
+
+When you deploy or test:
+
+```
+yarn prisma migrate deploy
+yarn prisma db seed
 ```
 
 ---
