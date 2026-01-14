@@ -1,0 +1,120 @@
+// -------------------------------------------------------
+// PRISMA SCHEMA — CMS-FIRST + AUTH + ECOMMERCE READY
+// -------------------------------------------------------
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// -------------------------------------------------------
+// ENUMS
+// -------------------------------------------------------
+
+enum ContentType {
+  PRODUCT
+  POST
+  PAGE
+  COLLECTION
+  MEDIA
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum Role {
+  USER
+  AUTHOR
+  EDITOR
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum Theme {
+  LIGHT
+  DARK
+  SYSTEM
+}
+
+// -------------------------------------------------------
+// USER MODEL
+// -------------------------------------------------------
+
+model User {
+  id                String    @id @default(cuid())
+  name              String?
+  email             String    @unique
+  password          String
+  role              Role      @default(USER)
+  theme             Theme     @default(SYSTEM)
+
+  // Refresh token rotation
+  refreshTokenHash  String?
+
+  contents          ContentItem[]
+
+  isActive          Boolean   @default(true)
+  isVerified        Boolean   @default(false)
+  isSeed            Boolean   @default(false) 
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+// -------------------------------------------------------
+// CONTENT MODEL — CMS-FIRST
+// Highly flexible, used by admin dashboard
+// -------------------------------------------------------
+
+model ContentItem {
+  id            String        @id @default(cuid())
+  type          ContentType
+  title         String?
+  slug          String?       @unique
+  description   String?
+  body          Json? // Rich content (editor output)
+  meta          Json? // SEO metada / custom fields
+
+  price         Float?
+  status        ContentStatus @default(DRAFT)
+
+  // Foreign key to user
+  authorId      String?
+  author        User?         @relation(fields: [authorId], references: [id])
+  isSeed        Boolean       @default(false)
+
+  // For product/category hierarchy
+  parentId      String?
+  parent        ContentItem?  @relation("Children", fields: [parentId], references: [id])
+  children      ContentItem[] @relation("Children")
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+// -------------------------------------------------------
+// SETTINGS MODEL 
+// -------------------------------------------------------
+
+model Settings {
+  id           String   @id @default("global") // singleton
+  siteName     String   @default("CMS + E-commerce Template")
+  contactEmail String   @default("admin@example.com")
+  theme        String   @default("light")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+
+// -------------------------------------------------------
+// FUTURE: ORDER / CART (optional)
+// -------------------------------------------------------
+// model Order { ... }
+// model OrderItem { ... }

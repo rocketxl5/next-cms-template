@@ -1,0 +1,25 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+
+/* Base them (light) */
+:root {
+    --color-bg: #FAFAFA; /* Neutral 50 */
+    --color-fg: #0A0A0A; /* Neutral 950 */
+    --color-border: #D4D4D4 /* Neutral 200 */
+}
+
+/* Dark theme */
+.dark {
+  --color-bg: #0A0A0A;
+  --color-fg: #FAFAFA;
+  --color-border: #262626; /* Neutral 800 */
+}
+
+@layer base {
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+    border: var(--color-border);
+  }
+}
