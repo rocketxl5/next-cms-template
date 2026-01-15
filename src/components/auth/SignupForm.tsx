@@ -1,5 +1,26 @@
 'use client'
 
+/**
+
+* SignupForm Component
+* ---
+*
+* Client-side form for user registration.
+*
+* Behavior:
+* 1. Collects name, email, password, and confirmPassword from user input.
+* 2. Validates input against `signupFormSchema`.
+* 3. Submits payload (excluding confirmPassword) to `/api/auth/signup` via `apiFetch`.
+* 4. Handles loading state, validation errors, and API errors.
+* 5. Calls `onSuccess` callback on successful registration.
+*
+* Props:
+* onSuccess: Callback invoked after successful signup.
+*
+* Wrapped with `withSuspense` HOC to display `SignupSkeleton` during lazy loading.
+*
+*/
+
 import { useState } from 'react';
 import { apiFetch } from '@/lib/api/apiFetch';
 import { withSuspense } from '@/components/hoc/withSuspense';

@@ -1,5 +1,25 @@
 'use client';
 
+/**
+
+* SigninForm Component
+* ---
+*
+* Client-side form for user authentication.
+*
+* Behavior:
+* 1. Collects email and password from user input.
+* 2. Validates input against `signinSchema`.
+* 3. Calls `/api/auth/signin` via `apiFetch`.
+* 4. Handles loading state, validation errors, and API errors.
+* 5. Calls `onSuccess` callback with authenticated user data on success.
+*
+* Props:
+* onSuccess: Callback invoked with `User` object after successful signin.
+*
+* Wrapped with `withSuspense` HOC to display `SigninSkeleton` during lazy loading.
+*/
+
 import { useState } from 'react';
 import { apiFetch } from '@/lib/api/apiFetch';
 import { signinSchema } from '@/lib/validators';
