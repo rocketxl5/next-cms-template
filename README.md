@@ -152,6 +152,9 @@ Create a `.env` file based on `.env.example`:
 DATABASE_URL=
 JWT_ACCESS_SECRET=
 JWT_REFRESH_SECRET=
+JWT_ACCESS_EXPIRES=
+JWT_REFRESH_EXPIRES=
+NODE_ENV=
 ```
 
 ### Database
