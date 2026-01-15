@@ -2,8 +2,8 @@
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-blue?logo=next.js)
 ![Prisma](https://img.shields.io/badge/Prisma-4.13-blue?logo=prisma)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
 ![React](https://img.shields.io/badge/React-19-blue?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4-blue?logo=tailwind-css)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
