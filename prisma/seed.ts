@@ -1,6 +1,10 @@
 /**
  * SEED SCRIPT
  * -------------------------------------------------------
+ * Warning:
+ *   - This seed script is meant for template/demo purposes.
+ *   - Running in a live production database may overwrite or create demo data.
+ * 
  * Purpose:
  *   - Create super admin, editor, author, and regular user
  *   - Seed sample CMS content: products, pages, blog posts
