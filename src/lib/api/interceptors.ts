@@ -1,7 +1,20 @@
 /**
  * API RESPONSE INTERCEPTORS
  * -------------------------
+ * 
+ * 
+ *  Axios Interceptors
  *
+ * This file sets up Axios request and response interceptors.
+ * It acts as a **prerequisite handler** for all API requests:
+ *  - Attaches authentication tokens (access token from cookies)
+ *  - Handles automatic token refresh if access tokens expire
+ *  - Centralizes error handling for API calls
+ *
+ * All API requests should import and use this Axios instance.
+ * This ensures consistent auth, error handling, and retry logic.
+ *
+ * 
  * Role:
  * - Attach response interceptors to the shared axios instance.
  * - This file does NOT create or export an API client; it only mutates it.
