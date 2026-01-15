@@ -1,16 +1,4 @@
-# Next CMS Template
-
-Auth-first Next.js App Router template designed for CMS, SaaS dashboards, and e-commerce foundations.
-
-Includes:
-
-- Role-based access control (USER / ADMIN / SUPER_ADMIN / etc)
-- Server-first session resolution (JWT access + refresh tokens)
-- Persistent theme system (guest + auth users)
-- CMS-ready architecture (blog, content, products)
-- API-first design with public/protected separation
-- Optimized folder structure for App Router
-
+# next-cms-template
 
 ![Next.js](https://img.shields.io/badge/Next.js-13-blue?logo=next.js)
 ![Prisma](https://img.shields.io/badge/Prisma-4.13-blue?logo=prisma)
@@ -18,202 +6,219 @@ Includes:
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.3-blue?logo=tailwind-css)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-A **production-ready Next.js App Router template** built for:
+**Auth-first CMS / SaaS / E-commerce starter built on Next.js App Router**
 
-- authentication-heavy apps
-- CMS + blog platforms
-- e-commerce foundations
-- admin dashboards
-- role-based systems
+`next-cms-template` is a production-grade starter designed for applications where **authentication, authorization, and data ownership are first-class concerns**.
 
-Designed to be **forked, reused, and scaled** across multiple projects.
+It provides a clean, opinionated foundation for building CMSs, SaaS products, and e-commerce platforms without reinventing auth, access control, or App Router architecture.
 
+---
 
-## ✨ Features
+## Why this template exists
 
-- Next.js App Router
-- Prisma + PostgreSQL
-- JWT authentication (access + refresh)
-- HTTP-only cookies
-- Server-first session resolution
-- Role-based authorization
-- Public / protected route groups
-- Persistent theme system (guest + authenticated users)
-- CMS + blog + shop–ready structure
-- API-first architecture
+Most starters treat authentication as an add-on.
 
+This template treats authentication as **infrastructure**.
 
-## 🧱 Architecture Highlights
+From the first request, the system assumes:
 
-- Server is the source of truth
-- No tokens stored in the client
-- Layouts enforce access
-- Explicit domain boundaries (auth / theme / routing)
-- Optimistic UI with server reconciliation
+* Users may or may not be authenticated
+* Sessions may expire
+* Roles matter
+* Server-side enforcement is mandatory
+* UI state must be SSR-safe
 
-This template favors **clarity and correctness over magic**.
+The result is a codebase that scales **in complexity**, not just in features.
 
+---
 
-## 📁 High-Level Structure
+## Who this is for
 
+This template is intended for developers who:
+
+* Build **auth-heavy applications** (CMS, dashboards, internal tools)
+* Care about **correct server/client boundaries**
+* Want **predictable App Router structure**
+* Prefer explicit architecture over magic
+
+It is **not** a UI kit, page builder, or low-code solution.
+
+---
+
+## Core features (v1.0.0)
+
+### Authentication
+
+* JWT access + refresh token strategy
+* httpOnly cookies
+* Refresh token rotation
+* Automatic session refresh
+* Server-side session validation
+
+### Authorization
+
+* Role-based access control (RBAC)
+* Server-enforced authorization
+* Role guards for pages, layouts, and APIs
+
+### Routing
+
+* App Router with explicit route groups
+* Public / auth / protected separation
+* Auth-aware layouts
+* SSR-safe redirects
+
+### Theme system
+
+* Light / dark / system themes
+* Works for guests and authenticated users
+* SSR-safe (no hydration mismatch)
+* Persisted per user
+
+### Data layer
+
+* Prisma ORM
+* PostgreSQL
+* Clean schema organization
+* Safe client lifecycle
+
+---
+
+## High-level architecture
+
+```
 app/
-  layout.tsx              → root layout (SSR theme + providers)
-  providers.tsx
+├─ (public)/        # Public pages (no auth required)
+├─ (auth)/          # Sign-in / sign-up / auth flows
+├─ (protected)/     # Authenticated application
+├─ api/             # Route handlers
+├─ layout.tsx       # Root layout
+```
 
-  (public)/               → unauthenticated area
-    page.tsx
-    auth/
-      signin/
-      signup/
-    blog/
-    shop/
+### Design principles
 
-  (protected)/            → authenticated area
-    layout.tsx
-    admin/
-    user/
+* **Auth is never optional** — it is handled before rendering
+* **Security lives on the server** — never in components
+* **Layouts enforce access** — pages assume valid context
+* **Clients consume state** — they do not define it
 
-  api/
-    auth/
-    admin/
+---
 
+## Authentication model
 
-## 🔐 Authentication
+* Access tokens are short-lived
+* Refresh tokens are long-lived and rotated
+* Tokens are stored in httpOnly cookies
+* Session validation happens on the server
 
-- JWT-based authentication (access + refresh tokens)
-- Tokens stored in **HTTP-only cookies**
-- Session resolved server-side via `getSession`
-- No client-side auth state duplication
+There is no reliance on client-side storage for security decisions.
 
-Auth routes:
+---
 
-/api/auth/signin
-/api/auth/signup
-/api/auth/refresh
-/api/auth/signout
-/api/auth/me
+## Authorization model
 
+Roles are enforced:
 
-## 👥 Roles & Authorization
+* In route handlers
+* In layouts
+* Before protected pages render
 
-Roles are enforced **server-side**, never in the client.
+Client components may reflect permissions, but **never enforce them**.
 
-Example roles:
+---
 
-enum Role {
-  USER
-  AUTHOR
-  EDITOR
-  ADMIN
-  SUPER_ADMIN
-}
+## Getting started
 
+### Prerequisites
 
-## 🎨 Theme System
+* Node.js 18+
+* PostgreSQL
+* pnpm / yarn / npm
 
-- Supports `light`, `dark`, and `system`
-- Works for guests and authenticated users
-- Guest theme persisted via cookie
-- Auth user theme persisted in database
-- SSR-safe theme resolution in the root layout
+### Installation
 
-Theme behavior:
+```bash
+git clone https://github.com/your-org/next-cms-template.git
+cd next-cms-template
+npm install
+```
 
-- UI updates optimistically
-- Persistence happens automatically
-- Theme is synced after signin via `router.refresh()`
+### Environment variables
 
-See `docs/theme.md` for full details.
+Create a `.env` file based on `.env.example`:
 
+```
+DATABASE_URL=
+JWT_ACCESS_SECRET=
+JWT_REFRESH_SECRET=
+```
 
-## 🧪 API Strategy
+### Database
 
-Clear separation between public and protected APIs:
+```bash
+npx prisma migrate dev
+npx prisma generate
+```
 
-| Route            | Purpose         |
-|------------------|-----------------|
-| `/api/products`  | public data     |
-| `/api/posts`     | blog content    |
-| `/api/admin/*`   | admin CRUD      |
-| `/api/auth/*`    | authentication  |
-| `/api/auth/me`   | current user    |
+### Development
 
-APIs are role-aware and server-secured.
+```bash
+npm run dev
+```
 
+---
 
-## 🗄️ Database migrations
+## What is intentionally not included
 
-- Use `yarn prisma migrate dev` during development
-- Commit migrations to git
-- Use `yarn prisma migrate deploy` in production
-- Never run `migrate dev` in production
+v1.0.0 is deliberately focused.
 
-## 🛍 Placeholder Pages
+Not included:
 
-This template includes sample placeholder pages for **Shop** and **Blog**:
+* CMS UI / page builders
+* Payments or subscriptions
+* Multitenancy
+* Audit logs
+* Plugin systems
 
-- `/shop` → main shop listing page  
-- `/shop/[slug]` → individual product pages  
-- `/blog` → main blog listing page  
-- `/blog/[slug]` → individual blog post pages  
+These are left to higher versions or downstream projects.
 
-These pages are **minimal placeholders**:
+---
 
-- They show simple messages explaining their purpose.  
-- They use consistent Tailwind styling for readability.  
-- They are intended to be **replaced with your own implementations** when building your project.  
+## Versioning policy
 
-💡 Tip: Keep these placeholders in the template to provide structure, but replace them with your own logic to fetch and display products, posts, or other content.
+This project follows semantic versioning:
 
+* **v1.x** — additive, non-breaking improvements
+* **v2.0** — architectural or breaking changes
 
+Public APIs (auth primitives, route structure, theme system) are considered stable within v1.
 
-## 📚 Documentation
+---
 
-Detailed documentation lives in `/docs`:
+## Documentation
 
-- `api-auth.md` – authentication endpoints
-- `auth-flow.md` – signin / refresh lifecycle
-- `architecture.md` – design decisions
-- `middleware.md` – access enforcement
-- `theme.md` – theme system
-- `password.md` – hashing strategy
-- `seed.md` – database seeding
-- `suspense.md` – async UI patterns
-- `tailwind.md` – styling setup
-- `next.md` – Next.js specifics
+Extensive internal documentation is available in `/docs`, covering:
 
-This README intentionally stays **high-level**.
+* Authentication flow
+* Route protection
+* Theme system
+* Prisma usage
+* Architectural decisions
 
+---
 
-## 🚀 Setup
+## License
 
-yarn install
-cp .env.example .env
-yarn prisma migrate dev
-yarn dev
+MIT
 
+---
 
-## 🎯 Who This Is For
+## Philosophy
 
-This template is ideal for building:
+This template optimizes for:
 
-- company websites
-- blogs & content platforms
-- online stores
-- admin dashboards
-- SaaS back offices
-- headless CMS projects
+* Correctness over convenience
+* Explicitness over magic
+* Long-term maintainability
 
-All from **one consistent foundation**.
-
-
-## 🧭 Philosophy
-
-This project favors:
-
-- explicit over implicit
-- server truth over client guesses
-- composition over conditionals
-- long-term maintainability over shortcuts
-
-If something feels “verbose”, it’s probably intentional.
+If those values align with your project, this template is a solid foundation.
